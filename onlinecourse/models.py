@@ -107,10 +107,13 @@ class Enrollment(models.Model):
     # question grade/mark
 
 class Question(models.Model):
-    course = models.ManyToManyField(Course)
+    """
+    The Question model class. Has a one-to-many relationship with Course
+    """
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     question_text = models.TextField()
-    question_grade = models.FloatField(max_length=4)
+    grade = models.FloatField(max_length=4)
 
     # <HINT> A sample model method to calculate if learner get the score of the question
     def is_get_score(self, selected_ids):
@@ -132,9 +135,9 @@ class Question(models.Model):
 # class Choice(models.Model):
 
 class Choice(models.Model):
-    question = models.ManyToManyField(Question)
-    choice = models.TextField()
-    validity = models.BooleanField()
+    question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.TextField()
+    is_correct = models.BooleanField()
 
 
 
@@ -143,7 +146,7 @@ class Choice(models.Model):
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
 class Submission(models.Model):
-   enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+   enrollment_id = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
 ## Check the spelling on the var below.
    choices = models.ManyToManyField(Choice)
 #    Other fields and methods you would like to design

@@ -50,6 +50,8 @@
                     </div>
                 {% endfor %}
             </div>
+
+            
             <!-- Task: show questions and choices -->
             <!-- <HINT> Use Bootstrap Collapse to hide exam first, more details could be found here
             https://www.w3schools.com/bootstrap4/bootstrap_collapse.asp-->
@@ -63,18 +65,19 @@
 
             -->
 
-            {% if user.is_authenticated %}
-                <div id="exam" class="collapse">
 
+
+            {% if user.is_authenticated %}
+                <div id="" class="">
+                    <!-- Click to expand the questions -->
                     <form id="questionform" action="point to a submit view" method="post">
                         <!-- ... for each question in the course ... -->
-                        {% for question in course.questions %}        
-                            <div class="card mt-1">
-                                <div class="card-header"><h5>{{ question.question_text}}</h5></div>
-                                {% csrf_token %}
-                                <div class="form-group">
-                                <!-- ... for each choice in the question ... -->
-                                {% for each choice in question.choices %}
+                        {% for question in course.question_set.all %}
+                        <div class="card mt-1">
+                            <div class="card-header"><h5>{{ question.question_text }}</h5></div>
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {% for choice in question.choice_set.all %}
                                     <div class="form-check">
                                         <label class="form-check-label">
                                             <input type="checkbox" name="choice_{{choice.id}}"
@@ -82,12 +85,15 @@
                                                 value="{{choice.id}}">{{ choice.choice_text }}
                                         </label>
                                     </div>
-                                </div>
+                                {% endfor %}
                             </div>
-                            <input class="btn btn-success btn-block" type="submit" value="Submit">
+                        </div>
+                        <input class="btn btn-success btn-block" type="submit" value="Submit">
+                        {% endfor %}
                     </form>
 
                 </div>
+            {% endif %}
 
             <!-- <HINT> If user is authenticated, show course exam with a list of question -->
 
