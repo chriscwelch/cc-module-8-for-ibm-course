@@ -135,6 +135,9 @@ class Question(models.Model):
 # class Choice(models.Model):
 
 class Choice(models.Model):
+    """ 
+    The choices model for saving the available choices for a question.
+    """
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.TextField()
     is_correct = models.BooleanField()
@@ -146,7 +149,10 @@ class Choice(models.Model):
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
 class Submission(models.Model):
-   enrollment_id = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    """
+    Model for submitting answers.
+    """
+    enrollment_id = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
 ## Check the spelling on the var below.
-   choices = models.ManyToManyField(Choice)
+    choices = models.ManyToManyField(Choice)
 #    Other fields and methods you would like to design

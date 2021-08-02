@@ -151,14 +151,20 @@ def submit(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     enrollment = Enrollment.objects.get(user=user, course=course)
     choices = extract_answers(request)
-    submission = Submission.objects.create(enrollment_id=enrollment)
+    print("selected_choices", choices)
+    submission = Submission(enrollment_id=enrollment)
+    submission.save()
 
-    ## This should work
-    # for choice in choices:
-    #     submission.choices.add(choice)
+    this_choice = Choice.objects.get(question_id=1, is_correct=1)
+    print('forced choice:', this_choice.__dict__)
 
-    # But this is another way to do it
-    submission.choices.set(choices)
+    selected_choice = Choice.objects.get(pk=1)
+    print("selected choice:", selected_choice.__dict__)
+
+    for choice in choices:
+        this_choice = Choice.objects.get(pk= +choice)
+        print("this choice:", this_choice.__dict__)
+        submission.choices.add(this_choice)
 
     return HttpResponseRedirect(reverse(viewname='onlinecourse:show_exam_result', args=(course.id, submission.id)))
 
@@ -174,11 +180,63 @@ def submit(request, course_id):
 def show_exam_result(request, course_id, submission_id):
     user = request.user
     course = get_object_or_404(Course, pk=course_id)
-    submission = get_object_or_404(Submission, pk=submission_id)
+    print("course dict:", course.__dict__)
+
+    # submission = get_object_or_404(Submission, pk=submission_id)
+    submission = Submission.objects.get(pk=submission_id)
+
+    print("submission:", submission)
+    print("submission dict:", submission.__dict__)
+    print("submission model meta:", Submission._meta.get_fields())
+
+    # Get the course object and submission object based on their ids in view arguments
+    # Get the selected choice ids from the submission record
+    # For each selected choice, check if it is a correct answer or not
+    # Calculate the total score by adding up the grades for all questions in the course
+    # Add the course, selected_ids, and grade to context for rendering HTML page
+
+    # For each selected choice, check if the answer was correct or not
+    
+    # Get the choices
+    # choices = submission.choice_set.all()
+    # choices = Choice.objects.filter(fk=submission.pk)
+    # choices = submission.choice_set.all()
+    # choices = submission.choices.all()
+
+    choices = Choice.objects.get(submission__id=submission.id)
+
+    print('choices', choices.__dict__)
+    print('choices queryset:', choices)
+
+    marks = []
+    grades = []
+
+    exam_result_text = []
+
+    # for choice in choices:
+    #     choice_object = {}
+    #     question = choice.question_set.all()
+    #     question_text = question.text
+    #     grade = +question.grade
+    #     grades.append(grade)
+    #     mark = 0
+    #     if choice.is_correct == True:
+    #         mark = +grade
+    #     marks.append(mark)
+    #     choice_object['text'] = question_text
+    #     choice_object['mark'] = mark
+
+    #     exam_result_text.append(choice_object)
+
+    # exam_result = marks.sum() / grades.sum()
+    exam_result = 0
+
 
     context = {}
     context['submission'] = submission
     context['course'] = course
+    context['exam_result'] = exam_result
+    context['exam_result_text'] = exam_result_text
 
     # We still need to find out which submissions were correct
 
