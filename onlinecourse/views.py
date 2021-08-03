@@ -203,15 +203,52 @@ def show_exam_result(request, course_id, submission_id):
     # choices = submission.choice_set.all()
     # choices = submission.choices.all()
 
-    choices = Choice.objects.get(submission__id=submission.id)
+    choices = ""
+
+    try:
+        choices = Choice.objects.get(submission__id=submission.id).values()
+    except:
+        choices = Choice.objects.filter(submission__id=submission.id).values()
 
     print('choices', choices.__dict__)
     print('choices queryset:', choices)
 
+    ids = []
     marks = []
     grades = []
 
     exam_result_text = []
+
+    for choice in choices:
+        print(choice)
+        print('id:', choice['id'])
+        ids.append(choice['id'])
+        question = Question.objects.get(pk=choice['question_id_id'])
+        grades.append(+question.grade)
+
+        exam_object = {}
+        exam_object['text'] = question.question_text
+        # exam_object['answer'] = question.choice_set.get(is_correct=True)
+        exam_object['answer'] = Choice.objects.filter(question_id=choice['question_id_id'],
+         is_correct=True).values('choice_text')[0]
+
+        exam_object['answer'] = exam_object['answer']['choice_text']
+
+        exam_object['given_answer'] = Choice.objects.filter(pk=choice['id']).values('choice_text')[0]
+        exam_object['given_answer'] = exam_object['given_answer']['choice_text']
+
+        exam_result_text.append(exam_object)
+
+        if choice['is_correct'] == True:
+            marks.append(+question.grade)
+
+    try:
+        print('marks:', sum(marks))
+        print('grade:', sum(grades))
+        print('score:', sum(marks) / sum(grades))
+    except:
+        print("couldn't get score")
+
 
     # for choice in choices:
     #     choice_object = {}
@@ -228,14 +265,15 @@ def show_exam_result(request, course_id, submission_id):
 
     #     exam_result_text.append(choice_object)
 
-    # exam_result = marks.sum() / grades.sum()
-    exam_result = 0
+    exam_result = ( sum(marks) / sum(grades) ) * 100
+    # exam_result = 0
 
 
     context = {}
     context['submission'] = submission
     context['course'] = course
-    context['exam_result'] = exam_result
+    context['ids'] = ids
+    context['grade'] = exam_result
     context['exam_result_text'] = exam_result_text
 
     # We still need to find out which submissions were correct

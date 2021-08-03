@@ -68,8 +68,11 @@
 
 
             {% if user.is_authenticated %}
-                <div id="" class="">
-                    <!-- Click to expand the questions -->
+                <h1>Here are the exam questions:</h1>
+                <a href="#questions" class="" data-toggle="collapse">Click to expand</a>
+                <div id="questions" class="collapse">
+                    
+
                     <form id="questionform" action="{% url 'onlinecourse:submit' course.pk %}"  method="post">
                         <!-- ... for each question in the course ... -->
                         {% for question in course.question_set.all %}
